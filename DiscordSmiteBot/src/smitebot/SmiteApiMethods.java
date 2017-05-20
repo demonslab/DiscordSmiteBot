@@ -17,10 +17,15 @@ public class SmiteApiMethods {
 		try {
 			sessionId = createSession();
 			System.out.println("Session Id: "+sessionId);
+
+		//	System.out.println("Team Details: "+getTeamDetails("Beeforoni"));
+		//	System.exit(0);
+			
 		} catch (Exception e) {
 			sessionId = null;
 			e.printStackTrace();
-		}	
+		}
+		
 	}
 	
 	
@@ -65,6 +70,15 @@ public class SmiteApiMethods {
 	
 	public String getTeamPlayers(String clanName) throws Exception{
 		String methodName = "getteamplayers";
+		String timestamp = Utils.getCurrentTimestamp();
+		String path = methodName+"JSON/"+Utils.devId+"/"+Utils.createSignature(methodName, timestamp)+"/"+sessionId+"/"+timestamp+"/"+getClanId(clanName);
+		String response = request.sendGet(path);
+		
+		return response;
+	}
+	
+	public String getTeamDetails(String clanName) throws Exception{
+		String methodName = "getteamdetails";
 		String timestamp = Utils.getCurrentTimestamp();
 		String path = methodName+"JSON/"+Utils.devId+"/"+Utils.createSignature(methodName, timestamp)+"/"+sessionId+"/"+timestamp+"/"+getClanId(clanName);
 		String response = request.sendGet(path);

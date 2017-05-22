@@ -1,16 +1,23 @@
 package smitebot;
 
+import java.awt.Color;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import objects.TeamMember;
-import objects.TeamOverview;
+import smitebot.embed_objects.PlayerEmbed;
+import smitebot.embed_objects.TeamMember;
+import smitebot.embed_objects.TeamOverview;
  
 public class BotListener extends ListenerAdapter {
  
+		//Eventually verified channels will be kept in a database with the name and asMentioned
 	private final static String[] verifiedChannels = {"smitebot"};
 	private final static String botName = "Smite Bot";
 	private final SmiteApiMethods session;
@@ -25,39 +32,70 @@ public class BotListener extends ListenerAdapter {
     	String[] input = e.getMessage().getRawContent().split(" ");
 
     	//Check if the bot is messaged
-    	boolean messageToBot = false;
-    	for (User user : e.getMessage().getMentionedUsers()){
-    		if (user.getName().equals(botName))
-    			messageToBot = true;
-    	}
+    	List<User> users = e.getMessage().getMentionedUsers();
+    	User bot = null;
+
+    	if (users == null)
+    		return;
+    	if (users.isEmpty())
+    		return;
+    		
+    	bot = users.get(0);
     	
-    	
-    	if (messageToBot){
-	    	if (! e.getChannel().getName().equals("smitebot")) {
-	    		e.getChannel().sendMessage(e.getAuthor().getAsMention() + " use one of the verified chat channels to utilize bot commands");
+    	if (botName.equals(bot.getName())){
+    		boolean verified = false;
+    		StringBuilder sb = new StringBuilder("**");
+    		for (String verifier : verifiedChannels) {
+    			sb.append("\n\t"+verifier);
+    			if (verifier.equals(e.getChannel().getName()))
+    				verified = true;
+    		}
+    		if (!verified) {
+    			e.getChannel().sendMessage(
+    					e.getAuthor().getAsMention() + " use one of the verified chat channels to properly use "+bot.getAsMention()+":"+sb.toString()+"**"
+    				).queue();
 	    	}
 	    	else {	
+	    		if (input.length == 1) 
+	    			e.getChannel().sendMessage(e.getAuthor().getAsMention() + " to see a list of commands, send the message:\n\t**"+bot.getAsMention()+" help**").queue();
 	    		//Ping
-		        if (input[1].equalsIgnoreCase("ping")) {
+	    		else if (input[1].equalsIgnoreCase("ping")) {
 		            e.getChannel().sendMessage(e.getAuthor().getAsMention() + " Pong!").queue();
 		        }
 		        
 		        //Help
 		        else if (input[1].equalsIgnoreCase("help")) {
-		        	String help = 
-		        			  "**ping**:\n\t test the bot\n"
-		        			+ "**getClanInfo** ***[clanName]***:\n\t return info about the clan\n"
-		        			+ "**getClanMembers** ***[clanName]***:\n\t return info about the members of the clan\n";
-
-		        	e.getChannel().sendMessage(e.getAuthor().getAsMention() + " Try the following commands:\n" + help + "Have Fun!").queue();
+		     
+		        	EmbedBuilder builder = new EmbedBuilder();
+		        	builder.setColor(Color.GREEN);		
+		        	
+		        	builder.addField("ping", "*tests the bot*", false);
+		        	builder.addField("getPatchInfo", "*returns info about the latest patch version*", false);
+		        	builder.addField("getClanInfo [clanName]", "*returns info about the given clan*", false);
+		        	builder.addField("getClanMembers [clanName]", "*returns info about members of the given clan (limited to 20/1000)*", false);
+		        	builder.addField("getPlayer [playerName]", "*returns info about the given player*", false);
+		        	
+		        	MessageBuilder mb = new MessageBuilder();
+		        	mb.setEmbed(builder.build());
+		        	mb.append(e.getAuthor().getAsMention() + " below are a list of commands for "+bot.getAsMention() +":");
+		        	e.getChannel().sendMessage(mb.build()).queue();
 		        }
 		
+	    		//Get Patch Info
+		        else if (input[1].equalsIgnoreCase("getPatchInfo")) {
+		            try {
+						e.getChannel().sendMessage(e.getAuthor().getAsMention() + " Version "+ new JSONObject(session.getPatchInfo()).getString("version_string")).queue();
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+		        }
+		        
 		        //Get Clan Info
 		        else if (input[1].equalsIgnoreCase("getclaninfo")) {
 		    		try {
 						String response = session.getTeamDetails(input[2]);
 						//parse and simplify response
-						e.getChannel().sendMessage(e.getAuthor().getAsMention() +new TeamOverview(new JSONArray(response).getJSONObject(0)).toString()).queue();
+						e.getChannel().sendMessage(e.getAuthor().getAsMention() +"\n"+new TeamOverview(new JSONArray(response).getJSONObject(0)).toString()).queue();
 						
 					} catch (Exception e1) {
 						e1.printStackTrace();
@@ -81,6 +119,26 @@ public class BotListener extends ListenerAdapter {
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
+		        }
+		        
+		        //Get Player
+		        else if (input[1].equalsIgnoreCase("getPlayer")) {
+		        	try {
+		        		String response = session.getPlayer(input[2]);
+		        		System.out.println(response);
+		        		
+		        		JSONObject player = new JSONArray(response).getJSONObject(0);
+	
+		        		e.getChannel().sendMessage(new PlayerEmbed(player, e).build()).queue();
+		        		
+		        	} catch (Exception e1) {
+		        		e1.printStackTrace();
+		        	}
+		        }
+		        
+		        //No Such Method
+		        else {
+	    			e.getChannel().sendMessage(e.getAuthor().getAsMention() + " method not found. To see a list of commands, send the message:\n\t**"+bot.getAsMention()+" help**").queue();
 		        }
 	        }
 	    }

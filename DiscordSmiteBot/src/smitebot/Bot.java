@@ -14,12 +14,10 @@ public class Bot {
 //    public static final String BOT_TOKEN = "MzE1MTU0NTU3NDAxNDMyMDY2.DACqsg.nLkof0R_ChX-65TAgpQcXLhe99Y";
     
     public static void main(String[] args) {    	
-		SmiteApiMethods session = SmiteApiMethods.getSession();
 
+    	SmiteApiMethods session = SmiteApiMethods.getSession();
     	try {
-    		
             jda = new JDABuilder(AccountType.BOT).addEventListener(new BotListener(session)).setToken(Utils.botToken).buildBlocking();
-    		
 
 	//		driver.getPlayer("DemonSlab");
 	//		driver.getMatchHistory("DemonSlab");

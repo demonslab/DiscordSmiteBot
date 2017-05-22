@@ -1,13 +1,14 @@
-package objects;
+package smitebot.embed_objects;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.TimeZone;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import smitebot.Utils;
 
 public class TeamMember {
 	/*
@@ -31,19 +32,10 @@ public class TeamMember {
 		
 		
 		try {
-			accountLevel = member.getInt("AccountLevel") + "";
-			name = member.getString("Name");
-			
-			//date joined
-			Date date = format.parse(member.getString("JoinedDatetime"));
-			format.setTimeZone(TimeZone.getTimeZone("GMT-4:00"));
-			joined = format.format(date);
-			
-			//last login
-			format.setTimeZone(TimeZone.getTimeZone("GMT"));
-			date = format.parse(member.getString("LastLoginDatetime"));
-			format.setTimeZone(TimeZone.getTimeZone("GMT-4:00"));
-			lastLogin = format.format(date);
+			this.accountLevel = member.getInt("AccountLevel") + "";
+			this.name = member.getString("Name");
+			this.joined = Utils.changeDateTimeZone(member.getString("JoinedDatetime"));
+			this.lastLogin = Utils.changeDateTimeZone(member.getString("LastLoginDatetime"));
 
 		
 		} catch (JSONException | ParseException e) {

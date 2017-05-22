@@ -38,7 +38,7 @@ public class SmiteApiMethods {
 		System.out.println("Creating Session");
 		request = new HttpRequest();
 		String methodName = "createsession";
-		String timestamp = Utils.getCurrentTimestamp();
+		String timestamp = Utils.getCurrentTimestampGMT();
 		System.out.println("Timestamp: "+timestamp);
 		String path = methodName+"JSON/"+Utils.devId+"/"+Utils.createSignature(methodName, timestamp)+"/"+timestamp;
 		String response = request.sendGet(path);
@@ -59,7 +59,7 @@ public class SmiteApiMethods {
 	
 	public String getClanId(String clanName) throws Exception{
 		String methodName = "searchteams";
-		String timestamp = Utils.getCurrentTimestamp();
+		String timestamp = Utils.getCurrentTimestampGMT();
 		String path = methodName+"JSON/"+Utils.devId+"/"+Utils.createSignature(methodName, timestamp)+"/"+sessionId+"/"+timestamp+"/"+clanName;
 		String response = request.sendGet(path);
 
@@ -70,7 +70,7 @@ public class SmiteApiMethods {
 	
 	public String getTeamPlayers(String clanName) throws Exception{
 		String methodName = "getteamplayers";
-		String timestamp = Utils.getCurrentTimestamp();
+		String timestamp = Utils.getCurrentTimestampGMT();
 		String path = methodName+"JSON/"+Utils.devId+"/"+Utils.createSignature(methodName, timestamp)+"/"+sessionId+"/"+timestamp+"/"+getClanId(clanName);
 		String response = request.sendGet(path);
 		
@@ -79,40 +79,48 @@ public class SmiteApiMethods {
 	
 	public String getTeamDetails(String clanName) throws Exception{
 		String methodName = "getteamdetails";
-		String timestamp = Utils.getCurrentTimestamp();
+		String timestamp = Utils.getCurrentTimestampGMT();
 		String path = methodName+"JSON/"+Utils.devId+"/"+Utils.createSignature(methodName, timestamp)+"/"+sessionId+"/"+timestamp+"/"+getClanId(clanName);
 		String response = request.sendGet(path);
 		
 		return response;
 	}
 	
-	public void getPlayer(String player) throws Exception{
+	public String getPlayer(String player) throws Exception{
 		String methodName = "getplayer";
-		String timestamp = Utils.getCurrentTimestamp();
+		String timestamp = Utils.getCurrentTimestampGMT();
 		String path = methodName+"JSON/"+Utils.devId+"/"+Utils.createSignature(methodName, timestamp)+"/"+sessionId+"/"+timestamp+"/"+player;
 		String response = request.sendGet(path);
 		
-		System.out.println("Get Player: "+response);
+		return response;
 	}
 	
 	
-	public void getMatchHistory(String player) throws Exception{
+	public String getMatchHistory(String player) throws Exception{
 		String methodName = "getmatchhistory";
-		String timestamp = Utils.getCurrentTimestamp();
+		String timestamp = Utils.getCurrentTimestampGMT();
 		String path = methodName+"JSON/"+Utils.devId+"/"+Utils.createSignature(methodName, timestamp)+"/"+sessionId+"/"+timestamp+"/"+player;
 		String response = request.sendGet(path);
 		
-		System.out.println("Match History: "+response);
+		return response;
 	}
 	
-	public void getPlayerAchievements(String playerId) throws Exception{
+	public String getPlayerAchievements(String playerId) throws Exception{
 		String methodName = "getplayerachievements";
-		String timestamp = Utils.getCurrentTimestamp();
+		String timestamp = Utils.getCurrentTimestampGMT();
 		String path = methodName+"JSON/"+Utils.devId+"/"+Utils.createSignature(methodName, timestamp)+"/"+sessionId+"/"+timestamp+"/"+playerId;
 		String response = request.sendGet(path);
 
-		System.out.println("Player Achievements: "+response);
+		return response;
 	}
 	
+	public String getPatchInfo() throws Exception{
+		String methodName = "getpatchinfo";
+		String timestamp = Utils.getCurrentTimestampGMT();
+		String path = methodName+"JSON/"+Utils.devId+"/"+Utils.createSignature(methodName, timestamp)+"/"+sessionId+"/"+timestamp;
+		String response = request.sendGet(path);
+		
+		return response;
+	}
 	
 }

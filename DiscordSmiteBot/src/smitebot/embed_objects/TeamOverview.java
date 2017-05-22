@@ -1,4 +1,4 @@
-package objects;
+package smitebot.embed_objects;
 
 import org.json.JSONObject;
 
